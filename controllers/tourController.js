@@ -1,4 +1,5 @@
 const Tour = require('../models/tourModel');
+const ApiFeatures = require('../utils/apiFeatures');
 
 exports.aliasTopTours = (req, res, next) => {
   req.query.limit = '5';
@@ -6,67 +7,14 @@ exports.aliasTopTours = (req, res, next) => {
   req.query.fields = 'name,price,ratingsAverage,duration';
   next();
 };
-class ApiFeatures {
-  constructor(query, queryString) {
-    this.query = query;
-    this.queryString = queryString;
-  }
 
-  filter() {
-    //1) FILTERING
-    const queryObj = { ...this.queryString };
-    const excludedFields = ['page', 'limit', 'sort', 'fields'];
-    excludedFields.forEach(el => delete queryObj[el]);
-
-    //2) ADVANCE FILTERING
-    let queryString = JSON.stringify(queryObj);
-    queryString = queryString.replace(
-      /\b(gt|gte|lt|lte)\b/g,
-      match => `$${match}`
-    );
-    // {duration: {$gte: 5}, difficulty: 'easy'}
-    // { duration: { gte: '5' }, difficulty: 'easy' }
-
-    this.query = this.query.find(JSON.parse(queryString));
-    return this;
-  }
-
-  sort() {
-    if (this.queryString.sort) {
-      const sortBy = this.queryString.sort.split(',').join(' ');
-      this.query = this.query.sort(sortBy);
-      //sort('price ratingsAverage')
-    } else {
-      this.query = this.query.sort('-createdAt');
-    }
-
-    if (this.queryString.fields) {
-      const fields = this.queryString.fields.split(',').join(' ');
-      this.query = this.query.select(fields);
-      // select('name price ratingsAverage duration')
-    } else {
-      this.query = this.query.select('-__v');
-    }
-    return this;
-  }
-
-  patinate() {
-    //PAGINATION
-
-    const limit = this.queryString.limit * 1 || 100;
-    const page = this.queryString.page * 1 || 1;
-    const skip = (page - 1) * limit;
-
-    this.query = this.query.skip(skip).limit(limit);
-    return this;
-  }
-}
 exports.getAllTours = async (req, res) => {
   try {
     // EXECUTE QUERY
     const features = new ApiFeatures(Tour, req.query)
       .filter()
       .sort()
+      .limitFields()
       .patinate();
     const tours = await features.query;
 
