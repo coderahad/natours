@@ -15,7 +15,7 @@ exports.getAllTours = async (req, res) => {
       .filter()
       .sort()
       .limitFields()
-      .patinate();
+      .paginate();
     const tours = await features.query;
 
     // SEND RESPONSE
@@ -104,6 +104,96 @@ exports.deleteTour = async (req, res) => {
   } catch (err) {
     res.status(404).json({
       status: 'fail',
+      message: err
+    });
+  }
+};
+
+exports.getTourStats = async (req, res) => {
+  try {
+    const stats = await Tour.aggregate([
+      {
+        $match: { ratingsAverage: { $gte: 4.5 } }
+      },
+      {
+        $group: {
+          _id: { $toUpper: '$difficulty' },
+          avgRating: { $avg: '$ratingsAverage' },
+          avgPrice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' }
+        }
+      },
+      {
+        $sort: {
+          avgPrice: 1
+        }
+      },
+      {
+        $match: { _id: { $ne: 'EASY' } }
+      }
+    ]);
+    res.status(200).json({
+      status: 'Success',
+      result: stats.length,
+      requestedAt: req.requestTime,
+      data: {
+        stats
+      }
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'Fail',
+      message: err
+    });
+  }
+};
+
+exports.getMonthlyPlan = async (req, res) => {
+  try {
+    const year = req.params.year * 1;
+    const plan = await Tour.aggregate([
+      { $unwind: '$startDates' },
+      {
+        $match: {
+          startDates: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`)
+          }
+        }
+      },
+      {
+        $group: {
+          _id: { $month: '$startDates' },
+          numTourStarts: { $sum: 1 },
+          tour: { $push: '$name' }
+        }
+      },
+      {
+        $sort: { numTourStarts: -1 }
+      },
+      {
+        $addFields: { month: '$_id' }
+      },
+      {
+        $project: { _id: 0 }
+      },
+      {
+        $limit: 12
+      }
+    ]);
+
+    res.status(200).json({
+      status: 'Success',
+      result: plan.length,
+      requestedAt: req.requestTime,
+      data: {
+        plan
+      }
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'Fail',
       message: err
     });
   }

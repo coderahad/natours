@@ -45,7 +45,7 @@ class ApiFeatures {
     return this;
   }
 
-  patinate() {
+  paginate() {
     //PAGINATION
 
     const limit = this.queryString.limit * 1 || 100;
