@@ -16,7 +16,7 @@ const tourSchema = new mongoose.Schema(
       minlength: [
         10,
         'A tour must have a name more than or equal 10 characters'
-      ],
+      ]
       // validate: [validator.isAlpha, 'A tour name contains only letter']
     },
     slug: String,
