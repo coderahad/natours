@@ -37,3 +37,5 @@ process.on('unhandledRejection', err => {
     process.exit(1);
   });
 });
+
+//database connection I have doubt about this so i removed DATABASE=mongodb+srv://Ahad_hossain:<PASSWORD>@cluster0-0hqre.mongodb.net/natours?retryWrites=true&w=majority
