@@ -46,7 +46,7 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre('save', async function(next) {
-  //only runs this function if password is modified
+  //only runs this function if password is modified. //when a new document created that time also password modified
   if (!this.isModified('password')) return next();
 
   // Hash password with cost of 12
@@ -57,6 +57,12 @@ userSchema.pre('save', async function(next) {
   next();
 });
 
+userSchema.pre('save', function(next) {
+  if (!this.isModified('password') || !this.isNew) return next();
+  // !this.isNew I added on my own because I want passwordChangeAt property on my new documents; I could not understand why jonas used this.isNew here
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
 userSchema.methods.correctPassword = async (
   candidatePassword,
   userPassword
