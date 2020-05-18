@@ -117,19 +117,27 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 3) send reset token to user's email
   const resetURL = `${req.protocol}://${req.get(
     'host'
-  )}/api/v1/user/resetPassword/${resetToken}`;
+  )}/api/v1/users/resetPassword/${resetToken}`;
 
-  const message = `Forget your password? please submit a patch request with your new password and passwordConfirm to: ${resetURL}.\n If you did't forget your password then ignore this message.`;
+  const message = `Forget your password? please submit a patch request with your new password and passwordConfirm to: ${resetURL}. \n If you didn't forget your password then ignore this message.`;
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'Your password reset token valid for 10 minutes',
+      message
+    });
 
-  await sendEmail({
-    email: user.email,
-    subject: 'Your password reset token valid for 10 minutes',
-    message
-  });
-  res.status(200).json({
-    status: 'success',
-    message: 'token sent to email'
-  });
+    res.status.json({
+      status: 'success',
+      message: 'Token sent to email'
+    });
+  } catch (err) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    return next(new AppError('There was an error sending the email', 500));
+  }
 });
 
 exports.resetPassword = (req, res, next) => {};
