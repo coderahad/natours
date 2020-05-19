@@ -127,12 +127,12 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
       message
     });
 
-    res.status.json({
+    res.status(200).json({
       status: 'success',
       message: 'Token sent to email'
     });
   } catch (err) {
-    // Comment out this two when testing reset password other wise resetPassword would not work as I have problem running this forgotPassword handler
+    // problem solved
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save({ validateBeforeSave: false });

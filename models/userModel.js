@@ -59,7 +59,7 @@ userSchema.pre('save', async function(next) {
 
 userSchema.pre('save', function(next) {
   if (!this.isModified('password') || !this.isNew) return next();
-  // !this.isNew I added on my own because I want passwordChangeAt property on my new documents; I could not understand why jonas used this.isNew here
+  // !this.isNew I added on my own because I want passwordChangedAt property on my new documents; I could not understand why jonas used this.isNew here
   this.passwordChangedAt = Date.now() - 1000;
   next();
 });
