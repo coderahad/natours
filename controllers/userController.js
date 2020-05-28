@@ -9,6 +9,7 @@ const filterObj = (obj, ...allowedFields) => {
   });
   return newObj;
 };
+
 exports.updateMe = catchAsync(async (req, res, next) => {
   // 1) Create error if user POSTs password data
   if (req.body.password || req.body.passwordConfirm) {
@@ -34,6 +35,15 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     }
   });
 });
+
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+  res.status(204).json({
+    status: 'success',
+    data: null
+  });
+});
+
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find();
   // SEND RESPONSE
