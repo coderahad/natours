@@ -50,24 +50,24 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-// userSchema.pre('save', async function(next) {
-//   //only runs this function if password is modified. //when a new document created that time also password modified
-//   if (!this.isModified('password')) return next();
+userSchema.pre('save', async function(next) {
+  //only runs this function if password is modified. //when a new document created that time also password modified
+  if (!this.isModified('password')) return next();
 
-//   // Hash password with cost of 12
-//   this.password = await bcrypt.hash(this.password, 12);
+  // Hash password with cost of 12
+  this.password = await bcrypt.hash(this.password, 12);
 
-//   // Delete password confirm field after the validation finished and just before save
-//   this.passwordConfirm = undefined;
-//   next();
-// });
+  // Delete password confirm field after the validation finished and just before save
+  this.passwordConfirm = undefined;
+  next();
+});
 
-// userSchema.pre('save', function(next) {
-//   if (!this.isModified('password') || this.isNew) return next();
-//   // !this.isNew I added on my own because I want passwordChangedAt property on my new documents; I could not understand why jonas used this.isNew here
-//   this.passwordChangedAt = Date.now() - 1000;
-//   next();
-// });
+userSchema.pre('save', function(next) {
+  if (!this.isModified('password') || this.isNew) return next();
+  // !this.isNew I added on my own because I want passwordChangedAt property on my new documents; I could not understand why jonas used this.isNew here
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
 
 userSchema.pre(/^find/, function(next) {
   // this points to the current query
