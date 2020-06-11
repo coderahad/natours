@@ -35,6 +35,14 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
+reviewSchema.pre(/^find/, function(next) {
+  this.populate({
+    path: 'user',
+    select: 'name photo'
+  });
+  next();
+});
+
 reviewSchema.statics.calcAverageRatings = async function(tourId) {
   const stats = await this.aggregate([
     {
@@ -49,23 +57,37 @@ reviewSchema.statics.calcAverageRatings = async function(tourId) {
     }
   ]);
   console.log(stats);
-  await Tour.findByIdAndUpdate(tourId, {
-    ratingsAverage: stats[0].avgRating,
-    ratingsQuantity: stats[0].nRatings
-  });
+  if (stats.length > 0) {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsAverage: stats[0].avgRating,
+      ratingsQuantity: stats[0].nRatings
+    });
+  } else {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsAverage: 4.5,
+      ratingsQuantity: 0
+    });
+  }
 };
+
+//findByIdAndUpdate
+//findByIdAndDelete
 
 reviewSchema.post('save', function() {
   // this points to the current review
   this.constructor.calcAverageRatings(this.tour);
 });
 
-reviewSchema.pre(/^find/, function(next) {
-  this.populate({
-    path: 'user',
-    select: 'name photo'
-  });
+reviewSchema.pre(/^findOneAnd/, async function(next) {
+  // this is the current query not document
+  this.r = await this.findOne();
+  console.log(this.r);
   next();
+});
+
+reviewSchema.post(/^findOneAnd/, async function() {
+  // await this.find does not work here, query has already executed
+  await this.r.constructor.calcAverageRatings(this.r.tour);
 });
 
 const Review = mongoose.model('Review', reviewSchema);
