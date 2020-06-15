@@ -121,3 +121,47 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
     }
   });
 });
+
+exports.getDistances = catchAsync(async (req, res, next) => {
+  const { latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(',');
+  const multiplier = unit === 'mi' ? 0.000621371 : 0.001;
+
+  if (!lat || !lng) {
+    next(
+      new AppError(
+        'Please provide latitude and longitude in the format lat,lng',
+        400
+      )
+    );
+  }
+
+  const distances = await Tour.aggregate([
+    // only geospatial aggregate is $geoNear. this has to be the first stage of the aggregation.
+    // another thing is that $geoNear needs at least one of our fields contain geospatial index. which we
+    // already have for our start location as a 2d sphere.
+    {
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: [lng * 1, lat * 1]
+        },
+        distanceField: 'distance',
+        distanceMultiplier: multiplier
+      }
+    },
+    {
+      $project: {
+        distance: 1,
+        name: 1
+      }
+    }
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      data: distances
+    }
+  });
+});

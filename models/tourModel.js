@@ -183,7 +183,24 @@ tourSchema.post(/^find/, function(docs, next) {
   next();
 });
 
+// tourSchema.pre('aggregate', function(next) {
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+//   // console.log(this.pipeline());
+//   next();
+// });
+
+// as geoNear should be the first stage in aggregate this midlwre for checking sec tour need workaround.
 tourSchema.pre('aggregate', function(next) {
+  //check firstInPipeline
+  const firstInPipeline = this.pipeline()[0];
+  if (firstInPipeline.hasOwnProperty('$geoNear')) {
+    //don't match secret tours, but splice "$match" stage after $geoNear in pipeline
+    this.pipeline().splice(1, 0, {
+      $match: { secretTour: { $ne: true } }
+    });
+    return next();
+  }
+
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
   // console.log(this.pipeline());
   next();
