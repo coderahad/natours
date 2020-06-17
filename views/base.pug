@@ -1,1 +1,19 @@
-h1 The Park Camper
+doctype html
+html
+    head
+        title Natours | #{tour}
+        //- this is java script and text mixed so title= will not work. = reads all code after it as java script
+        <link rel="stylesheet" href="css/style.css"/>
+        //- we can use HTML code directly on pug. it also runs in pug. Moreover we can use javascript code on pug. It also runs on pug. 
+        //- there are two type of comments in pug. //- completely vanishes from code. but // shows in html template.
+        //- link(rel='stylesheet' href='css/style.css');
+        <link rel='shortcut icon' type='image/png' href='img/favicon.png'/>
+        
+
+    body
+        h1= tour
+        h3= user.toUpperCase()
+        p the natours tours are fun.
+        // comment shows in html
+        -const x = 9
+        h2= 2 * x 
