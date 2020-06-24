@@ -28,4 +28,11 @@ locations.forEach(loc => {
     bounds.extend(loc.coordinates);
 })
 
-map.fitBounds(bounds);
+map.fitBounds(bounds, {
+    padding: {
+        top: 200,
+        bottom: 150,
+        left: 100,
+        right: 100
+    }
+});
