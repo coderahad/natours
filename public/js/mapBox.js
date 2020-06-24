@@ -25,7 +25,7 @@ locations.forEach(loc => {
     }).setLngLat(loc.coordinates).addTo(map);
 
     // 4)) Add popup
-    new mapboxgl.Popup().setLngLat(loc.coordinates).setHTML(`<p>Day ${loc.day}: ${loc.description}</p>`).addTo(map); 
+    new mapboxgl.Popup({ offset: 30 }).setLngLat(loc.coordinates).setHTML(`<p>Day ${loc.day}: ${loc.description}</p>`).addTo(map); 
     
     // 3) Extend map bounds to include current location
     bounds.extend(loc.coordinates);
