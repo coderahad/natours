@@ -6,7 +6,9 @@
   "scripts": {
     "start": "nodemon server.js",
     "start:prod": "NODE_ENV=production nodemon server.js",
-    "debug": "ndb server.js"
+    "debug": "ndb server.js",
+    "watch:js": "parcel watch ./public/js/index.js --out-dir ./public/js --out-file bundle.js",
+    "build:js": "parcel watch ./public/js/index.js --out-dir ./public/js --out-file bundle.js"
   },
   "author": "Ahad hossain",
   "license": "ISC",
@@ -40,6 +42,7 @@
     "eslint-plugin-react-hooks": "^1.7.0",
     "ndb": "^1.1.5",
     "nodemon": "^1.19.4",
+    "parcel-bundler": "^1.12.4",
     "prettier": "^1.17.1"
   },
   "engines": {
