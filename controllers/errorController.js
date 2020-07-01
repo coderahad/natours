@@ -25,37 +25,59 @@ const handleJWTExpiredError = () =>
 const sendErrorDev = (err, req, res) => {
   // API
   if (req.originalUrl.startsWith('/api')) {
-    res.status(err.statusCode).json({
+    return res.status(err.statusCode).json({
       status: err.status,
       message: err.message,
       error: err,
       stack: err.stack
     });
   }
+  // 1) log error
+  console.error('ERROR', err);
+
   // RENDERED WEBSITE
-  res.status(err.statusCode).render('error', {
+  return res.status(err.statusCode).render('error', {
     title: 'Something went wrong!',
     msg: err.message
   });
 };
 const sendErrorProd = (err, req, res) => {
-  // Operational, trusted error: send message to client
-  if (err.isOperational) {
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message
-    });
+  // A) API
+  if (req.originalUrl.startsWith('/api')) {
+    // Operational, trusted error: send message to client
+    if (err.isOperational) {
+      return res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message
+      });
+    }
     // Programming or other unknown error : don't leak error details
-  } else {
     // 1) log error
     console.error('ERROR', err);
 
     // 2) send generic message
-    res.status(500).json({
+    return res.status(500).json({
       status: 'error',
       message: 'Something went very wrong!'
     });
   }
+  // B) RENDERED WEBSITE
+  // Operational, trusted error: send message to client
+  if (err.isOperational) {
+    return res.status(err.statusCode).render('error', {
+      title: 'Somethind went wrong!',
+      msg: err.message
+    });
+  }
+  // Programming or other unknown error : don't leak error details
+  // 1) log error
+  console.error('ERROR', err);
+
+  // 2) send generic message
+  return res.status(500).render('error', {
+    title: 'Something went wrong!',
+    msg: 'Please Try again later!'
+  });
 };
 
 module.exports = (err, req, res, next) => {
@@ -67,6 +89,7 @@ module.exports = (err, req, res, next) => {
     sendErrorDev(err, req, res);
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
+    error.message = err.message;
     if (error.name === 'CastError') error = handleCastErrorDB(error);
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);
     if (error.name === 'ValidationError')
