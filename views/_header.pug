@@ -5,8 +5,8 @@ header.header
         img(src='/img/logo-white.png' alt='Natours logo')
     nav.nav.nav--user
         if user
-            a.nav__el.nav__el--logout(href='#') Log out
-            a.nav__el(href='#') 
+            a.nav__el.nav__el--logout Log out
+            a.nav__el(href='/me') 
                 //- here it took time why the image is not linked in tour page but works in other page. Then I found I didn't put '/' before img/users.. It is necessary 
                 //- and I missed it during fixing the problem of linking public folder files as static files. we had to put '/' before css/, img/ ohterwise they make some wrong routes
                 img.nav__user-img(src=`/img/users/${user.photo}` alt=`${user.name}`)
