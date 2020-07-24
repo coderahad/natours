@@ -63,4 +63,5 @@ if(userDataForm)
         // in java script the tour-id from webpage is written as tourId(camelcase). it is automatically converted.
         const {tourId} = e.target.dataset;
         bookTour(tourId);
-      })
+      });
+      
