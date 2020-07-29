@@ -8621,7 +8621,7 @@ var bookTour = /*#__PURE__*/function () {
 
           case 3:
             session = _context.sent;
-            console.log(session); // 2) create chedkout form + charge credit card
+            console.log(session); // 2) create checkout form + charge credit card
 
             _context.next = 7;
             return stripe.redirectToCheckout({
@@ -9025,7 +9025,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "3498" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "5882" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

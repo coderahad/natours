@@ -1,4 +1,4 @@
-// this class comes from the stripe library linked to the tour.pug page.
+// this class comes from the stripe library linked to the base.pug page.
 import axios from 'axios';
 import { showAlert } from './alerts';
 
@@ -13,7 +13,7 @@ export const bookTour = async tourId => {
   
     console.log(session);
   
-    // 2) create chedkout form + charge credit card
+    // 2) create checkout form + charge credit card
     await stripe.redirectToCheckout({
       sessionId: session.data.session.id
     })
