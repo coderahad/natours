@@ -1,6 +1,7 @@
 const Tour = require('../models/tourModel');
 // eslint-disable-next-line import/order
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const Booking = require('./../models/bookingModel');
 const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
 const AppError = require('../utils/appError');
