@@ -59,6 +59,7 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
+// webhook checkout route so that express.json can not parse the body and convert data into json.
 app.post(
   '/webhook-checkout',
   express.raw({ type: 'application/json' }),
